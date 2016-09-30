@@ -1,2 +1,7 @@
 data/*
 config.py
+
+__pycache__/*
+
+*.swp
+*.swo
