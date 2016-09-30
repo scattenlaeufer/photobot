@@ -4,12 +4,15 @@ import config
 from git import Repo, RemoteProgress
 import os
 
+class MyProgressPrinter(RemoteProgress):
+	def update(self, op_code, cur_count, max_count=None, message=''):
+		print(op_code, cur_count, max_count, cur_count / (max_count or 100.0), message or "NO MESSAGE")
+
 if os.path.isdir(config.data_dir):
 	data_repo = Repo(config.data_dir)
 	if not data_repo.is_dirty():
-		pass
+		remote = data_repo.remote()
+		for fetch_info in remote.pull(progress=MyProgressPrinter()):
+			print("Updated %s to %s" % (fetch_info.ref, fetch_info.commit))
 else:
-	data_repo = Repo.clone_from(config.data_repo_url, config.data_dir)
-
-print(data_repo.working_tree_dir)
-print(data_repo.remotes)
+	data_repo = Repo.clone_from(config.data_repo_url, config.data_dir, progress=MyProgressPrinter())
